@@ -32,19 +32,21 @@ function ImageGallery({searchQuery, onModalOpen}) {
             return;
         }
 
+        setStatus('pending');
+
         fetchImages(searchQuery, page)
             .then(data => {
                 if (data.totalHits > 0) {
                     setTotalHits(data.totalHits);
-                    setStatus('resolved');
-                    
                     if (page === 1) {
                         setImages(data.hits);
+                        setStatus('resolved');
                         return toast.success(`Hooray! We found ${data.totalHits} images of ${searchQuery}.`);
                     }
 
                     if (page > 1) {
                         setImages(prevState => [...prevState, ...data.hits]);
+                        setStatus('resolved');
                     }
                     
                     if (Math.ceil(totalHits / imagesPerPage) === page) {
@@ -53,6 +55,9 @@ function ImageGallery({searchQuery, onModalOpen}) {
                 }
                 
                 else {
+                    setImages([]);
+                    setPage(1);
+                    setTotalHits(1);
                     setStatus('rejected');
                     return toast.error("Sorry, there are no images matching your search query. Please try again.");
                 }
